@@ -23,34 +23,37 @@ app.post("/repositories", (request, response) => {
     likes: 0
   };
 
+  repositories.push(repository)
+
   return response.json(repository);
 });
 
 app.put("/repositories/:id", (request, response) => {
+  const { title, url, techs } = request.body
   const { id } = request.params;
-  const updatedRepository = request.body;
 
-  repositoryIndex = repositories.findindex(repository => repository.id === id);
+  const repositoryFound = repositories.find(repository => repository.id === id);
 
-  if (repositoryIndex < 0) {
+  if (!repositoryFound) {
     return response.status(404).json({ error: "Repository not found" });
   }
+  repositoryFound.title = title;
+  repositoryFound.url = url;
+  repositoryFound.techs = techs;
 
-  const repository = { ...repositories[repositoryIndex], ...updatedRepository };
-
-  repositories[repositoryIndex] = repository;
-
-  return response.json(repository);
+  return response.json(repositoryFound);
 });
 
 app.delete("/repositories/:id", (request, response) => {
   const { id } = request.params;
 
-  repositoryIndex = repositories.findIndex(repository => repository.id === id);
+  const repositoryFound = repositories.find(repository => repository.id === id);
 
-  if (repositoryIndex > 0) {
+  if (!repositoryFound) {
     return response.status(404).json({ error: "Repository not found" });
   }
+
+  const repositoryIndex = repositories.indexOf(repositoryFound);
 
   repositories.splice(repositoryIndex, 1);
 
@@ -60,15 +63,15 @@ app.delete("/repositories/:id", (request, response) => {
 app.post("/repositories/:id/like", (request, response) => {
   const { id } = request.params;
 
-  repositoryIndex = repositories.findIndex(repository => repository.id === id);
+  const repositoryFound = repositories.find(repository => repository.id === id);
 
-  if (repositoryIndex < 0) {
+  if (!repositoryFound) {
     return response.status(404).json({ error: "Repository not found" });
   }
 
-  const likes = ++repositories[repositoryIndex].likes;
+  const likes = ++repositoryFound.likes;
 
-  return response.json('likes');
+  return response.json(repositoryFound);
 });
 
 module.exports = app;
